@@ -1,0 +1,35 @@
+
+version: '3'
+services:
+  db:
+    container_name: restapi-db
+    image: mysql
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: restapi
+    volumes:
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
+    ports:
+      - "3306:3306"
+    restart: always
+
+  web:
+    container_name: restapi-web
+    links:
+      - db
+    image: restapi
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: restapi
+    ports:
+      - "80:8080"
+    restart: always
+
